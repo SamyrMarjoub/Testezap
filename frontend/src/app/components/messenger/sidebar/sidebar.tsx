@@ -5,7 +5,6 @@ import Image from 'next/image'
 import cavera from '../../../../../public/cavera.jpg'
 import pathethic from '../../../../../public/pathethic.png'
 import React, { useState } from 'react'
-import gato from '../../../../../public/gato.jpg'
 import { FaCog, FaSignOutAlt } from 'react-icons/fa'
 import { useRouter } from 'next/navigation'
 import { setGlobalState, useGlobalState } from '@/globalstate/globalstate'
@@ -13,6 +12,7 @@ export default function component() {
 
   const [selectedChat, setSelectedChat] = useState(null);
   const [userData, setUserData] = useGlobalState('userData')
+  const [isOpenModalFriend, setIsOpenModalFriend] = useGlobalState('isOpenModalFriend')
   const [openConfig, setOpenConfig] = useState(false)
   const router = useRouter();
 
@@ -29,6 +29,35 @@ export default function component() {
     router.push('/login')
   }
 
+  const AvatarComponent = ({ userData }: { userData: any }) => {
+    const getInitial = (name: string) => name ? name.charAt(0).toUpperCase() : "?";
+
+    return userData?.profilePicture ? (
+      <img
+        alt="avatar"
+        src={userData.profilePicture}
+        width={'100%'}
+        key={userData.profileImageUrl}
+        height={'100%'}
+        style={{ borderRadius: "20px", objectFit: "cover" }}
+      />
+    ) : (
+      <Box
+        width="80px"
+        height="80px"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        // borderRadius="50%"
+        backgroundColor={userData?.defaultcolor || "#ccc"}
+        color="white"
+        fontSize="2xl"
+        fontWeight="bold"
+      >
+        <Text>{getInitial(userData?.username)}</Text>
+      </Box>
+    );
+  };
 
   const ChatItem = ({ avatar, name, lastMessage, time, isSelected, onClick }) => {
     return (
@@ -76,9 +105,9 @@ export default function component() {
       <Box height={'80px'} width={'100%'}>
         <Input color={'gray.400'} _placeholder={{ color: 'gray.400' }} placeholder='Search' padding={'20px'} border={'none'} outline={'none'} borderRadius={'20px'} height={'100%'} bg={colors.default.bg_primary} type='text' />
       </Box>
-      {/* <Box _hover={{background:'gray.700'}} cursor={'pointer'} display={'flex'} alignItems={'center'} height={'50px'} bg={colors.default.bg_primary} mt={'10px'} padding={'20px'} borderRadius={'20px'} width={'100%'}>
-        <Text fontSize={'14px'} color={'gray.400'}>Amigos</Text>
-      </Box> */}
+      <Box onClick={()=>setGlobalState('isOpenModalFriend', true)} _hover={{background:'gray.700'}} cursor={'pointer'} display={'flex'} alignItems={'center'} height={'40px'} bg={colors.default.bg_primary} mt={'10px'} padding={'20px'} borderRadius={'10px'} width={'100%'}>
+        <Text fontSize={'14px'} color={'gray.400'}>Adicionar Amigo</Text>
+      </Box>
       <Box pt={'0'} overflow={'auto'} height={'90%'}>
         {chats.map((chat) => (
           <ChatItem
@@ -96,7 +125,7 @@ export default function component() {
       <Box width={'100%'} justifyContent='center' display={'flex'} height={'10%'}>
         <Box bg={colors.default.bg_primary} borderRadius={'20px'} width={'100%'} display={'flex'} alignItems={'center'} p={'10px'}>
           <Box borderRadius={'20px'} width={'80px'} height={'80px'} overflow={'hidden'}>
-            <Image style={{ borderRadius: '20PX' }} alt='avatar' src={gato} width={'100%'} h={'100%'} objectFit={'cover'} />
+            <AvatarComponent userData={userData} />
           </Box>
 
           <Box ml={3} display={'flex'} flexDirection={'column'} justifyContent={'center'} flex={1}>
@@ -105,7 +134,7 @@ export default function component() {
           </Box>
 
           <Box display={'flex'} gap={3} ml={3}>
-            <FaCog onClick={() => setGlobalState('isOpenModalConfig',true)} size={24} cursor={'pointer'} />
+            <FaCog onClick={() => setGlobalState('isOpenModalConfig', true)} size={24} cursor={'pointer'} />
             <FaSignOutAlt onClick={logOut} size={24} cursor={'pointer'} />
           </Box>
         </Box>

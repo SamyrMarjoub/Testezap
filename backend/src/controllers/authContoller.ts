@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../config/firebase";
+import randomColor from "randomcolor";
 
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -19,6 +20,7 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
     });
 
     console.log("Usuário criado com sucesso:", user.uid);
+    const color = randomColor();
 
     // Criando documento do usuário no Firestore
     const userRef = db.collection("users").doc(user.uid);
@@ -26,6 +28,7 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
       uid: user.uid,
       email: user.email,
       username: username || "Usuário",
+      defaultcolor:color,
       createdAt: new Date(),
       credits: 0,
     });

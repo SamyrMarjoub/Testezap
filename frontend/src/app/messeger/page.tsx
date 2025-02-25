@@ -25,6 +25,22 @@ const Dashboard = () => {
 
   if (!token) router.push("/login")
 
+  const fetchUserData = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/user/${uid}`);
+      console.log("User Data:", response.data);
+      const userdata = response.data;
+      setGlobalState('userData', userdata);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (uid) fetchUserData();
+  }, [token, uid, router]);
+
+
   function ModalConfig() {
     const [isOpenModalConfig, setGlobalState] = useGlobalState("isOpenModalConfig");
 
@@ -47,26 +63,30 @@ const Dashboard = () => {
       }
 
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('image', file);
       formData.append('uid', uid);
 
       try {
-        const response = await fetch('/api/upload-profile', {
-          method: 'POST',
-          body: formData,
+        const response = await axios.post('http://localhost:5000/api/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
         });
 
-        const data = await response.json();
-        if (response.ok) {
-          alert('Imagem de perfil atualizada!');
+        if (response.status === 200) {
+          // alert('Imagem de perfil atualizada!');
+          setGlobalState(false);
+          window.location.reload();
+
         } else {
-          alert(`Erro: ${data.message}`);
+          alert(`Erro: ${response.data.message}`);
         }
       } catch (error) {
         console.error('Erro ao enviar imagem:', error);
         alert('Erro ao enviar imagem');
       }
     };
+
 
     if (!isOpenModalConfig) return null; // Se o modal não estiver aberto, retorna nada
 
@@ -131,8 +151,8 @@ const Dashboard = () => {
 
               {/* Fazendo a última div ocupar o espaço restante */}
               <Box flex={1} display={'flex'} alignItems={'flex-end'} gap={'10px'} justifyContent={'flex-end'}>
-                <Button onClick={() => setGlobalState(false)} bg={'transparent'} fontSize={'16px'} border={`1px solid ${colors.default.blue}`} color={'white'} borderRadius={'10px'} width={'100px'}>Close</Button>
-                <Button bg={colors.default.blue} fontSize={'16px'} color={'white'} width={'120px'}>Salvar</Button>
+                <Button onClick={() => setGlobalState(false)} bg={'transparent'} fontSize={'16px'} border={`1px solid ${colors.default.blue}`} color={'white'} borderRadius={'10px'} width={'150px'}>Close</Button>
+                {/* <Button bg={colors.default.blue} fontSize={'16px'} color={'white'} width={'120px'}>Salvar</Button> */}
 
               </Box>
             </Box>
@@ -143,22 +163,61 @@ const Dashboard = () => {
       </Box>
     );
   }
+  function ModalFriend() {
+    const [isOpenModalFriend, setGlobalState] = useGlobalState("isOpenModalFriend");
 
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5000/api/user/${uid}`);
-        console.log("User Data:", response.data);
-        const userdata = response.data
-        setGlobalState('userData', userdata)
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    };
+    if (!isOpenModalFriend) return null; // Se o modal não estiver aberto, retorna nada
 
-    if (uid) fetchUserData();
-  }, [token, uid, router]);
+    return (
+      <Box
+        onClick={() => setGlobalState(false)} // Apenas um argumento
+        width="100%"
+        height="100vh"
+        position="fixed"
+        top="0"
+        left="0"
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        zIndex="1000"
+        className="externalLinkComponentMain"
+        bg="rgba(0, 0, 0, 0.8)"
+      >
+
+        <Box onClick={(e) => e.stopPropagation()} width={'400px'} display={'flex'} justifyContent={'center'} alignItems={'center'} height={'350px'} rounded={'20px'} bg={colors.default.bg_primary}>
+          <Box width={'95%'} height={'95%'} pos={'relative'}>
+            <IoMdClose size={'30px'} cursor={'pointer'} onClick={() => setGlobalState(false)} style={{ top: '0px', right: '0px', position: 'absolute' }} />
+            <Box w={'100%'} height={'100%'} display={'flex'} flexDirection={'column'}>
+              <Text fontSize={'20px'}>Adicionar Amigos</Text>
+
+              <Box
+                width={'100%'}
+                flexDir={'column'}
+                alignItems={'center'}
+                display={'flex'}
+                justifyContent={'center'}
+                mt={'50px'}
+              >
+               
+
+
+              </Box>
+
+              {/* Fazendo a última div ocupar o espaço restante */}
+              <Box flex={1} display={'flex'} alignItems={'flex-end'} gap={'10px'} justifyContent={'flex-end'}>
+                <Button onClick={() => setGlobalState(false)} bg={'transparent'} fontSize={'16px'} border={`1px solid ${colors.default.blue}`} color={'white'} borderRadius={'10px'} width={'150px'}>Close</Button>
+                {/* <Button bg={colors.default.blue} fontSize={'16px'} color={'white'} width={'120px'}>Salvar</Button> */}
+
+              </Box>
+            </Box>
+
+          </Box>
+        </Box>
+
+      </Box>
+    )
+  }
 
   return (
     <Box width={'100%'} display={'flex'} justifyContent={'center'} height={'100vh'} bg={colors.default.bg_primary}>
@@ -166,6 +225,7 @@ const Dashboard = () => {
         <Sidebar />
         <Maincomponent />
         <ModalConfig />
+        <ModalFriend />
       </Box>
     </Box>
   );

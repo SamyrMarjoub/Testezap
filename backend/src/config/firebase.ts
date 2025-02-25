@@ -4,7 +4,10 @@ import { getFirestore } from "firebase-admin/firestore";
 import fs from "fs";
 import dotenv from 'dotenv';
 
-dotenv.config(); // Carrega as variáveis de ambiente
+// dotenv.config(); // Carrega as variáveis de ambiente
+dotenv.config({ path: "src/config/.env" });
+
+console.log("FIREBASE_STORAGE_BUCKET:", process.env.FIREBASE_STORAGE_BUCKET); // Depuração
 
 // Verifica se a variável do bucket foi carregada corretamente
 if (!process.env.FIREBASE_STORAGE_BUCKET) {
