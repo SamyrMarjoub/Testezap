@@ -1,3 +1,4 @@
+"use client"
 import colors from '@/app/styles/colors'
 import { Box, Input, Text } from '@chakra-ui/react'
 import Image from 'next/image'
@@ -6,14 +7,28 @@ import pathethic from '../../../../../public/pathethic.png'
 import React, { useState } from 'react'
 import gato from '../../../../../public/gato.jpg'
 import { FaCog, FaSignOutAlt } from 'react-icons/fa'
+import { useRouter } from 'next/navigation'
+import { setGlobalState, useGlobalState } from '@/globalstate/globalstate'
 export default function component() {
 
   const [selectedChat, setSelectedChat] = useState(null);
+  const [userData, setUserData] = useGlobalState('userData')
+  const [openConfig, setOpenConfig] = useState(false)
+  const router = useRouter();
 
   const chats = [
     { id: 1, avatar: cavera, name: 'Lord Caveira', lastMessage: 'Manda 2 doses ai', time: '22h' },
     { id: 2, avatar: pathethic, name: 'Pathethic', lastMessage: 'Patético', time: '1h' }
   ];
+
+  function logOut() {
+    localStorage.removeItem('uid')
+    localStorage.removeItem('email')
+    localStorage.removeItem('token')
+
+    router.push('/login')
+  }
+
 
   const ChatItem = ({ avatar, name, lastMessage, time, isSelected, onClick }) => {
     return (
@@ -59,8 +74,11 @@ export default function component() {
   return (
     <Box padding={'10px'} display={'flex'} justifyContent={'center'} flexDir={'column'} bg={colors.default.bg_secondary} width={'30%'} height={'100%'}>
       <Box height={'80px'} width={'100%'}>
-        <Input placeholder='Search' padding={'20px'} border={'none'} outline={'none'} borderRadius={'20px'} height={'100%'} bg={colors.default.bg_primary} type='text' />
+        <Input color={'gray.400'} _placeholder={{ color: 'gray.400' }} placeholder='Search' padding={'20px'} border={'none'} outline={'none'} borderRadius={'20px'} height={'100%'} bg={colors.default.bg_primary} type='text' />
       </Box>
+      {/* <Box _hover={{background:'gray.700'}} cursor={'pointer'} display={'flex'} alignItems={'center'} height={'50px'} bg={colors.default.bg_primary} mt={'10px'} padding={'20px'} borderRadius={'20px'} width={'100%'}>
+        <Text fontSize={'14px'} color={'gray.400'}>Amigos</Text>
+      </Box> */}
       <Box pt={'0'} overflow={'auto'} height={'90%'}>
         {chats.map((chat) => (
           <ChatItem
@@ -76,19 +94,19 @@ export default function component() {
 
       </Box>
       <Box width={'100%'} justifyContent='center' display={'flex'} height={'10%'}>
-        <Box bg={colors.default.bg_primary} width={'100%'} display={'flex'} alignItems={'center'} p={'10px'}>
+        <Box bg={colors.default.bg_primary} borderRadius={'20px'} width={'100%'} display={'flex'} alignItems={'center'} p={'10px'}>
           <Box borderRadius={'20px'} width={'80px'} height={'80px'} overflow={'hidden'}>
             <Image style={{ borderRadius: '20PX' }} alt='avatar' src={gato} width={'100%'} h={'100%'} objectFit={'cover'} />
           </Box>
 
           <Box ml={3} display={'flex'} flexDirection={'column'} justifyContent={'center'} flex={1}>
-            <Text fontWeight={'bold'} fontSize={'lg'}>{'Laito'}</Text>
+            <Text fontWeight={'bold'} fontSize={'lg'}>{userData.username}</Text>
             <Text color={'gray.500'} fontSize={'sm'}>ID: {1223}</Text>
           </Box>
 
           <Box display={'flex'} gap={3} ml={3}>
-            <FaCog size={24} cursor={'pointer'} />
-            <FaSignOutAlt size={24} cursor={'pointer'} />
+            <FaCog onClick={() => setGlobalState('isOpenModalConfig',true)} size={24} cursor={'pointer'} />
+            <FaSignOutAlt onClick={logOut} size={24} cursor={'pointer'} />
           </Box>
         </Box>
       </Box>

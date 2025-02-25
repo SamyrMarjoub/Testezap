@@ -1,21 +1,29 @@
-import { initializeApp } from "firebase/app";
-// import { getAnalytics } from "firebase/analytics";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore"; // Adicionando Firestore
+import admin from "firebase-admin";
+import { getAuth } from "firebase-admin/auth";
+import { getFirestore } from "firebase-admin/firestore";
+import fs from "fs";
+import dotenv from 'dotenv';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDQR-oYRMv2k66q1mP4B6VdcU6JaemIACc",
-  authDomain: "testezap-1d30e.firebaseapp.com",
-  projectId: "testezap-1d30e",
-  storageBucket: "testezap-1d30e.firebasestorage.app",
-  messagingSenderId: "287869169580",
-  appId: "1:287869169580:web:148baa2ff64ed04ef7d409",
-  measurementId: "G-N309J67HKH"
-};
+dotenv.config(); // Carrega as variáveis de ambiente
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app); // Inicializando Firestore
+// Verifica se a variável do bucket foi carregada corretamente
+if (!process.env.FIREBASE_STORAGE_BUCKET) {
+  throw new Error("A variável FIREBASE_STORAGE_BUCKET não está definida no .env");
+}
 
-// const analytics = getAnalytics(app);
-export { app, auth, db }; // Agora Firestore (db) está exportado corretamente
+// Carregar credenciais do Firebase Admin a partir do arquivo JSON
+const serviceAccount = JSON.parse(fs.readFileSync("src/config/firebase-admin.json", "utf-8"));
+
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET, // Usa a variável do .env
+  });
+}
+
+// Obtém o bucket corretamente
+const auth = getAuth();
+const db = getFirestore();
+const bucket = admin.storage().bucket(process.env.FIREBASE_STORAGE_BUCKET);
+
+export { auth, db, bucket };

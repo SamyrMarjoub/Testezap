@@ -4,6 +4,8 @@ import React, { useState } from 'react'
 import colors from '../styles/colors'
 import axios from 'axios'
 import { useRouter } from "next/navigation";
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
+import {auth} from '../services/firebaseClient'
 
 export default function page() {
 
@@ -12,20 +14,27 @@ export default function page() {
     const router = useRouter();
 
     async function handleLogin(e: { preventDefault: () => void }) {
-        e.preventDefault()
-
+        e.preventDefault();
+    
         try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+    
+            // Obter o token JWT do Firebase Authentication
+            const idToken = await user.getIdToken();
+    
+            // Enviar para o backend
             const response = await axios.post("http://localhost:5000/api/auth/loginUser", {
-                email: email,
-                password: password,
+                idToken,
             });
-
-            const { token } = response.data;
-
-            localStorage.setItem("token", token);
-            console.log('ta certo', token)
+    
+            const { userId, email: userEmail } = response.data;
+    
+            localStorage.setItem("token", idToken);
+            localStorage.setItem("email", userEmail);
+            localStorage.setItem("uid", userId);
+    
             router.push("/messeger");
-
         } catch (error: any) {
             console.log("Erro ao registrar:", error.response?.data || error.message);
             alert(`Erro ao registrar: ${error.response?.data.message || "Erro desconhecido"}`);
@@ -66,7 +75,7 @@ export default function page() {
                     >
                         <Input
                             type="text"
-                            placeholder="Usuário"
+                            placeholder="Email"
                             border="1px solid rgba(255, 255, 255, 0.3)"
                             height="40px"
                             width="100%"
