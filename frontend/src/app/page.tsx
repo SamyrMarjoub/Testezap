@@ -1,95 +1,98 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client"
+import { Box, Text, Flex, Button } from '@chakra-ui/react';
+import { motion } from 'framer-motion';
+import { FaWhatsapp } from 'react-icons/fa';
+import colors from './styles/colors';
+import { useRouter } from 'next/navigation';
 
-export default function Home() {
+const MotionBox = motion(Box);
+
+const HomePage = () => {
+
+  const router = useRouter()
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <Box
+      width="100%"
+      height="100vh"
+      // bg="linear-gradient(160deg, #EBF8FF 0%, #BEE3F8 100%)" // Gradiente corrigido
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      bg={colors.default.bg_primary}
+    >
+      <MotionBox
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+      >
+        <Flex
+          direction="column"
+          alignItems="center"
+          p={8}
+          bg={colors.default.bg_secondary}
+          borderRadius="2xl"
+          boxShadow="xl"
+          textAlign="center"
+          maxW="90vw"
+          _hover={{
+            transform: 'scale(1.02)',
+            transition: 'all 0.3s ease-in-out'
+          }}
+        >
+          <MotionBox
+            as={FaWhatsapp}
+            size="80px"
+            color={colors.default.blue} // Cor do WhatsApp
+            mb={6}
+            animate={{
+              scale: [1, 1.1, 1],
+              rotate: [0, 5, -5, 0]
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Text
+            fontSize={{ base: "4xl", md: "5xl" }}
+            fontWeight="extrabold"
+            bgGradient="linear(to-r, #3182CE, #25855A)" // Gradiente azul + verde
+            bgClip="text"
+            color={'white'}
+            mb={4}
           >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
+            TesteZap 1.0
+          </Text>
+
+          <Text
+            fontSize="xl"
+            color="gray.300"
+            maxW="400px"
+            mb={6}
           >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+            Conecte-se com seus contatos de forma simples e segura.
+            Comece agora mesmo selecionando uma conversa ou iniciando uma nova!
+          </Text>
+          <Box width={'100%'}>
+            <Button onClick={() => router.push('/login')} width={'100%'} height={'40px'} bg={colors.default.blue} color={'white'} fontSize={'18px'}>Começar!</Button>
+
+          </Box>
+          <Flex
+            mt={4}
+            gap={3}
+            color="gray.300"
+            alignItems="center"
+          >
+            <Box w="30px" h="2px" bg="#3182CE" opacity="0.5" />
+            <Text fontSize="sm">v1.0.0</Text>
+            <Box w="30px" h="2px" bg="#3182CE" opacity="0.5" />
+          </Flex>
+        </Flex>
+      </MotionBox>
+    </Box>
   );
-}
+};
+
+export default HomePage;

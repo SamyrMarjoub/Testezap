@@ -1,11 +1,14 @@
 "use client"
-import { Box, Button, Input, Text } from '@chakra-ui/react'
+import { Box, Button, HStack, Icon, Input, Link, Text } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import colors from '../styles/colors'
 import axios from 'axios'
 import { useRouter } from "next/navigation";
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 import {auth} from '../services/firebaseClient'
+import { FaGithub } from 'react-icons/fa'
+import { FcGoogle } from 'react-icons/fc'
+import { HiOutlineChatBubbleOvalLeft } from 'react-icons/hi2'
 
 export default function page() {
 
@@ -43,74 +46,118 @@ export default function page() {
 
     return (
         <Box
-            bg={colors.default.bg_primary}
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            width="100%"
-            height="100vh"
-            padding="20px"
+        bg={colors.default.bg_primary}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        width="100%"
+        minHeight="100vh"
+        padding="20px"
+    >
+        <Box
+            width={['90%', '380px']}
+            height="auto"
+            padding={["15px", "25px"]}
+            borderRadius="10px"
+            bg="rgba(255, 255, 255, 0.05)"
+            backdropFilter="blur(10px)"
+            border="1px solid rgba(255, 255, 255, 0.1)"
         >
-            <Box
-                width={['90%', '380px']} // Responsivo: 90% da largura em mobile, fixo em 500px para telas maiores
-                height="auto"
-                padding="20px"
-                borderRadius="10px"
-            //   boxShadow="lg"
-            //   bg="white"
-            >
-                <Box display="flex" flexDirection="column" width="100%" height="100%">
-                    <Text fontSize="25px" textAlign="center" mb="20px">
+            <Box display="flex" flexDirection="column" width="100%" gap={4}>
+                <Box textAlign="center" mb="15px">
+                    <Icon 
+                        as={HiOutlineChatBubbleOvalLeft} 
+                        w={8} 
+                        h={8} 
+                        color={colors.default.blue} 
+                        mb="10px"
+                    />
+                    <Text fontSize="2xl" fontWeight="bold" color="white">
                         Welcome to TextZap!
                     </Text>
-                    <form
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '15px',
-                            alignItems: 'center',
-                            width: '100%',
-                        }}
-                        onSubmit={handleLogin}
-                    >
+                    <Text fontSize="sm" color="gray.300" mt={1}>
+                        Conecte-se para continuar
+                    </Text>
+                </Box>
+    
+                <form onSubmit={handleLogin} style={{ width: '100%' }}>
+                    <Box display="flex" flexDirection="column" gap={4}>
                         <Input
-                            type="text"
+                            type="email"
                             placeholder="Email"
                             border="1px solid rgba(255, 255, 255, 0.3)"
-                            height="40px"
-                            width="100%"
-                            maxWidth="400px"
-                            padding="10px"
-                            onChange={(e) => setEmail(e.target.value)}
+                            height="45px"
+                            color="white"
+                            onChange={(e)=>setEmail(e.target.value)}
+                            padding={'10px'}
+                            _placeholder={{ color: 'gray.300' }}
+                            // focusBorderColor={colors.default.blue}
                         />
+                        
                         <Input
                             type="password"
                             placeholder="Senha"
                             border="1px solid rgba(255, 255, 255, 0.3)"
-                            height="40px"
-                            width="100%"
-                            maxWidth="400px"
-                            onChange={(e) => setPassword(e.target.value)}
-                            padding="10px"
+                            height="45px"
+                            padding={'10px'}
+                            color="white"
+                            onChange={(e)=>setPassword(e.target.value)}
+                            _placeholder={{ color: 'gray.300' }}
+                            // focusBorderColor={colors.default.blue}
                         />
+    
                         <Button
                             type="submit"
-                            border="1px solid rgba(255, 255, 255, 0.3)"
-                            height="40px"
-                            padding="10px"
-                            width="100%"
-                            maxWidth="400px"
-                            mt={'20px'}
+                            height="45px"
                             bg={colors.default.blue}
                             color="white"
-                            _hover={{ bg: 'blue.600' }}
+                            _hover={{ bg: 'blue.600', transform: 'translateY(-2px)' }}
+                            transition="all 0.2s"
                         >
                             Entrar
                         </Button>
-                    </form>
-                </Box>
+                    </Box>
+                </form>
+    
+                <HStack justify="center" mt={2}>
+                    <Text fontSize="sm" color="gray.300">
+                        Não tem conta?{' '}
+                        <Link 
+                            href="/register" 
+                            color={colors.default.blue}
+                            fontWeight="500"
+                            _hover={{ textDecoration: 'underline' }}
+                        >
+                            Registre-se
+                        </Link>
+                    </Text>
+                </HStack>
+    
+                {/* <HStack width="100%" my={4}>
+                <Box 
+                    flex={1} 
+                    borderTop="1px solid" 
+                    borderColor="rgba(255, 255, 255, 0.3)"
+                />
+                <Text 
+                    fontSize="sm" 
+                    color="gray.300" 
+                    px={2}
+                    whiteSpace="nowrap"
+                >
+                    OU
+                </Text>
+                <Box 
+                    flex={1} 
+                    borderTop="1px solid" 
+                    borderColor="rgba(255, 255, 255, 0.3)"
+                />
+            </HStack> */}
+    
+               
             </Box>
         </Box>
+    </Box>
 
     )
 }

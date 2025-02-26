@@ -1,9 +1,10 @@
 'use client'
-import { Box, Text, Input, Button } from '@chakra-ui/react';
+import { Box, Text, Input, Button, HStack, Stack, Icon, Link } from '@chakra-ui/react';
 import colors from '../styles/colors';
 import { useState } from 'react';
 import axios from 'axios'
 import { useRouter } from 'next/navigation';
+import { HiOutlineUserAdd } from 'react-icons/hi';
 
 
 const RegisterPage = () => {
@@ -26,7 +27,7 @@ const RegisterPage = () => {
             const response = await axios.post("http://localhost:5000/api/auth/registerUser", {
                 email: email,
                 password: password,
-                username:username
+                username: username
             });
 
             alert("Usuário registrado com sucesso!");
@@ -45,93 +46,122 @@ const RegisterPage = () => {
             justifyContent="center"
             alignItems="center"
             width="100%"
-            height="100vh"
+            minHeight="100vh"
             padding="20px"
         >
             <Box
                 width={['90%', '500px']}
                 height="auto"
-                padding="20px"
+                padding={["15px", "25px"]}
                 borderRadius="10px"
+                bg="rgba(255, 255, 255, 0.05)"
+                backdropFilter="blur(10px)"
+                border="1px solid rgba(255, 255, 255, 0.1)"
             >
-                <Box display="flex" flexDirection="column" width="100%" height="100%">
-                    <Text fontSize="25px" textAlign="center" mb="20px">
-                        Crie sua conta no TextZap!
-                    </Text>
-                    <form
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '15px',
-                            alignItems: 'center',
-                            width: '100%',
-                        }}
-                        onSubmit={registerFunction}
-                    >
-
-                        <Input
-                            type="text"
-                            placeholder="Email"
-                            border="1px solid rgba(255, 255, 255, 0.3)"
-                            height="40px"
-                            width="100%"
-                            maxWidth="400px"
-                            value={email}
-                            padding="10px"
-                            onChange={(e) => setEmail(e.target.value)}
+                <Box display="flex" flexDirection="column" width="100%" gap={4}>
+                    <Box textAlign="center" mb="15px">
+                        <Icon
+                            as={HiOutlineUserAdd}
+                            w={8}
+                            h={8}
+                            color={colors.default.blue}
+                            mb="10px"
                         />
-                         <Input
-                            type="text"
-                            placeholder="Nome de usuario"
-                            border="1px solid rgba(255, 255, 255, 0.3)"
-                            height="40px"
-                            width="100%"
-                            maxWidth="400px"
-                            value={username}
-                            padding="10px"
-                            onChange={(e) => setUsername(e.target.value)}
-                        />
-                        <Box display={'flex'} gap={'10px'}>
-                            <Input
-                                type="password"
-                                placeholder="Senha"
-                                border="1px solid rgba(255, 255, 255, 0.3)"
-                                height="40px"
-                                width="100%"
-                                maxWidth="400px"
-                                padding="10px"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                        <Text fontSize="2xl" fontWeight="bold" color="white">
+                            Crie sua conta no TextZap!
+                        </Text>
+                        <Text fontSize="sm" color="gray.300" mt={1}>
+                            Junte-se à nossa comunidade
+                        </Text>
+                    </Box>
 
-                            />
+                    <form onSubmit={registerFunction} style={{ width: '100%' }}>
+                        <Stack spacing={4}>
                             <Input
-                                type="password"
-                                placeholder="Confirme sua senha"
+                                type="email"
+                                placeholder="Email"
                                 border="1px solid rgba(255, 255, 255, 0.3)"
-                                height="40px"
-                                width="100%"
-                                maxWidth="400px"
-                                padding="10px"
-                                value={confirm}
-                                onChange={(e) => setConfirm(e.target.value)}
-
+                                height="45px"
+                                color="white"
+                                _placeholder={{ color: 'gray.300' }}
+                                // focusBorderColor={colors.default.blue}
+                                padding={'10px'}
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                             />
-                        </Box>
-                        <Button
-                            type="submit"
-                            border="1px solid rgba(255, 255, 255, 0.3)"
-                            height="40px"
-                            padding="10px"
-                            width="100%"
-                            maxWidth="400px"
-                            mt={'20px'}
-                            bg={colors.default.blue}
-                            color="white"
-                            _hover={{ bg: 'blue.600' }}
-                        >
-                            Registrar
-                        </Button>
+
+                            <Input
+                                type="text"
+                                placeholder="Nome de usuário"
+                                border="1px solid rgba(255, 255, 255, 0.3)"
+                                height="45px"
+                                color="white"
+                                _placeholder={{ color: 'gray.300' }}
+                                padding={'10px'}
+                                // focusBorderColor={colors.default.blue}
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                            />
+
+                            <Stack direction={['column', 'row']} spacing={3}>
+                                <Input
+                                    type="password"
+                                    placeholder="Senha"
+                                    border="1px solid rgba(255, 255, 255, 0.3)"
+                                    height="45px"
+                                    padding={'10px'}
+                                    color="white"
+                                    _placeholder={{ color: 'gray.300' }}
+                                    // focusBorderColor={colors.default.blue}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                />
+
+                                <Input
+                                    type="password"
+                                    placeholder="Confirme sua senha"
+                                    border="1px solid rgba(255, 255, 255, 0.3)"
+                                    padding={'10px'}
+                                    height="45px"
+                                    color="white"
+                                    _placeholder={{ color: 'gray.300' }}
+                                    // focusBorderColor={colors.default.blue}
+                                    value={confirm}
+                                    onChange={(e) => setConfirm(e.target.value)}
+                                />
+                            </Stack>
+
+                            <Button
+                                type="submit"
+                                height="45px"
+                                bg={colors.default.blue}
+                                color="white"
+                                _hover={{
+                                    bg: 'blue.600',
+                                    transform: 'translateY(-2px)'
+                                }}
+                                transition="all 0.2s"
+                            >
+                                Registrar
+                            </Button>
+                        </Stack>
                     </form>
+
+                    <HStack justify="center" mt={2}>
+                        <Text fontSize="sm" color="gray.300">
+                            Já tem conta?{' '}
+                            <Link
+                                href="/login"
+                                color={colors.default.blue}
+                                fontWeight="500"
+                                _hover={{ textDecoration: 'underline' }}
+                            >
+                                Faça login
+                            </Link>
+                        </Text>
+                    </HStack>
+
+
                 </Box>
             </Box>
         </Box>
