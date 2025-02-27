@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Button, Input, Text } from "@chakra-ui/react";
+import { Box, Button, Icon, Input, Text } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import colors from "../styles/colors";
 import Sidebar from "../components/messenger/sidebar/sidebar";
@@ -10,21 +10,36 @@ import axios from "axios";
 import { useGlobalState, setGlobalState } from "@/globalstate/globalstate";
 import { IoMdClose } from "react-icons/io";
 import { MdAdd } from "react-icons/md";
-import { collection, getDocs, query, setDoc, where, doc, updateDoc, deleteDoc } from "firebase/firestore";
-import { db, auth } from '../services/firebaseClient'; // Certifique-se de importar corretamente
 import Maincomponentnochat from "../components/messenger/sidebar/maincomponentnochat";
 import Loading from '../components/geral/loading';
+import { FiArrowRight } from "react-icons/fi";
+import { handleSearch, handleAddFriend, handleAcceptRequest, handleRejectRequest, fetchFriendRequests } from "../components/firestore.ts/firestore";
 
 const Dashboard = () => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const token = localStorage.getItem('token')
   const router = useRouter();
   const uid = localStorage.getItem('uid')
-  const [friendRequests, setFriendRequests] = useState([]);
-  const [avatar, setAvatar] = useState('')
   const [userData, setUserData] = useGlobalState('userData')
   const [userSelectedData, setUserSelectedData] = useGlobalState('userSelectedData')
   const [isLoading, setIsLoading] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth
+      setWindowWidth(width)
+      if (width >= 800) {
+        setIsSidebarOpen(true)
+      } else {
+        setIsSidebarOpen(false)
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+    handleResize()
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   useEffect(() => {
     if (!token) {
@@ -46,27 +61,6 @@ const Dashboard = () => {
     if (uid) fetchUserData();
   }, [uid]);
 
-  useEffect(() => {
-    fetchFriendRequests();
-  }, []);
-  useEffect(() => {
-    console.log(userSelectedData)
-  }, [userSelectedData])
-
-  const fetchFriendRequests = async () => {
-    const userId = auth.currentUser?.uid;
-    console.log("aqui1")
-
-    if (!uid) return;
-
-    const q = query(collection(db, 'friendships'), where('user2', '==', uid), where('status', '==', 'pending'));
-    const querySnapshot = await getDocs(q);
-    const requests = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    console.log("aqui2", requests)
-
-    setFriendRequests(requests);
-
-  };
 
   const fetchUserData = async () => {
     try {
@@ -78,6 +72,8 @@ const Dashboard = () => {
       console.error("Error fetching user data:", error);
     }
   };
+
+ 
 
   function ModalConfig() {
     const [isOpenModalConfig, setGlobalState] = useGlobalState("isOpenModalConfig");
@@ -103,7 +99,15 @@ const Dashboard = () => {
       const formData = new FormData();
       formData.append('image', file);
       formData.append('uid', uid);
-
+      // useEffect(() => {
+      //   const loadRequests = async () => {
+      //     const requests = await fetchFriendRequests();
+      //     setFriendRequests(requests);
+      //     console.log("request aqui", requests)
+      //   };
+  
+      //   loadRequests();
+      // }, []);
       try {
         const response = await axios.post('http://localhost:5000/api/upload', formData, {
           headers: {
@@ -207,89 +211,19 @@ const Dashboard = () => {
     const [search, setSearch] = useState('');
     const [userFound, setUserFound] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [friendRequests, setFriendRequests] = useState([]);
+
+    useEffect(() => {
+      const unsubscribe = fetchFriendRequests(setFriendRequests);
+  
+      return () => unsubscribe && unsubscribe(); // Cleanup da escuta
+    }, []);
 
     if (!isOpenModalFriend) return null; // Se o modal não estiver aberto, retorna nada
 
     function closeModal() {
       setGlobalState(false)
     }
-
-    const handleSearch = async () => {
-      if (!search) return;
-      setLoading(true);
-
-      const q = query(collection(db, 'users'), where('username', '==', search));
-      const querySnapshot = await getDocs(q);
-
-      if (!querySnapshot.empty) {
-        const userData = querySnapshot.docs[0].data();
-        setUserFound(userData);
-
-        // Verifica se já são amigos
-        const friendId = userData.uid;
-        const friendshipQuery = query(
-          collection(db, 'friendships'),
-          where('status', '==', 'accepted'),
-          where('user1', 'in', [uid, friendId]),
-          where('user2', 'in', [uid, friendId])
-        );
-
-        const friendshipSnapshot = await getDocs(friendshipQuery);
-
-        if (!friendshipSnapshot.empty) {
-          alert('Este usuário já está na sua lista de amigos!');
-          setUserFound(null);
-        }
-      } else {
-        setUserFound(null);
-      }
-
-      setLoading(false);
-    };
-
-
-    const handleAddFriend = async () => {
-      if (!uid) return;
-      // const userId = auth.currentUser?.uid;
-      const friendId = userFound.uid;
-
-      if (!uid || !friendId) return;
-
-      try {
-        await setDoc(doc(db, 'friendships', `${uid}_${friendId}`), {
-          user1: uid,
-          user1Name: userData.username,
-          user1Avatar: userData.profilePicture || "",
-          user2: friendId,
-          user2Name: userFound?.username,
-          user2Avatar: userFound?.profilePicture,
-          status: 'pending',
-        });
-        alert('Pedido de amizade enviado!');
-      } catch (error) {
-        console.error('Erro ao adicionar amigo:', error);
-      }
-    };
-
-    const handleAcceptRequest = async (requestId) => {
-      try {
-        await updateDoc(doc(db, 'friendships', requestId), { status: 'accepted' });
-        setFriendRequests(friendRequests.filter(req => req.id !== requestId));
-        alert('Pedido de amizade aceito!');
-      } catch (error) {
-        console.error('Erro ao aceitar pedido de amizade:', error);
-      }
-    };
-
-    const handleRejectRequest = async (requestId) => {
-      try {
-        await deleteDoc(doc(db, 'friendships', requestId));
-        setFriendRequests(friendRequests.filter(req => req.id !== requestId));
-        alert('Pedido de amizade rejeitado!');
-      } catch (error) {
-        console.error('Erro ao rejeitar pedido de amizade:', error);
-      }
-    };
 
 
     return (
@@ -325,20 +259,20 @@ const Dashboard = () => {
                     onChange={(e) => setSearch(e.target.value)}
                     flex={1}
                   />
-                  <Button bg={colors.default.blue} color="white" onClick={handleSearch} isLoading={loading} _hover={{ bg: "blue.600" }}>
-                    Buscar
+                  <Button onClick={() => handleSearch(search, uid, setUserFound, setLoading)} disabled={loading}>
+                    {loading ? "Buscando..." : "Buscar"}
                   </Button>
                 </Box>
                 {userFound && (
                   <Box mt={4} p={3} bg="gray.700" borderRadius="8px" display="flex" alignItems="center" gap={3}>
                     <img src={userFound.profilePicture} width={'50px'} height={'50px'} />
                     <Text flex={1}>{userFound.username}</Text>
-                    <Button color={'white'} bg={colors.default.blue} onClick={handleAddFriend}>Adicionar</Button>
+                    <Button color={'white'} bg={colors.default.blue} onClick={() => handleAddFriend(uid, userData, userFound)}>Adicionar</Button>
                   </Box>
                 )}
                 <Box mt={6}>
                   <Text fontSize="lg" mb={3}>Pedidos de amizade pendentes</Text>
-                  {friendRequests.length > 0 ? (
+                  {friendRequests?.length > 0 ? (
                     friendRequests.map(request => (
                       <Box key={request.id} p={3} bg="gray.700" borderRadius="8px" display="flex" alignItems="center" gap={3} mt={2}>
                         {request.user1Avatar ?
@@ -348,10 +282,10 @@ const Dashboard = () => {
                           </Box>
                         }
                         <Text color={'white'} flex={1}>
-                          {request.user1Name || "Uusario"}
+                          {request.user1Name || "Usuario"}
                         </Text>
-                        <Button color={'white'} bg={'green.solid'} size="md" onClick={() => handleAcceptRequest(request.id)}>Aceitar</Button>
-                        <Button bg={'red.solid'} color={'white'} colorScheme="red" size="md" onClick={() => handleRejectRequest(request.id)}>Rejeitar</Button>
+                        <Button onClick={() => handleAcceptRequest(request.id, setFriendRequests, friendRequests)}>Aceitar</Button>
+                        <Button onClick={() => handleRejectRequest(request.id, setFriendRequests, friendRequests)}>Rejeitar</Button>
                       </Box>
                     ))
                   ) : (
@@ -375,9 +309,33 @@ const Dashboard = () => {
 
   return (
     <Box width={'100%'} display={'flex'} justifyContent={'center'} height={'100vh'} bg={colors.default.bg_primary}>
-      <Box display={'flex'} width={'1500px'} bg={colors.default.bg_secondary} height={'100%'}>
-        <Sidebar />
+      <Box display={'flex'} className="messegerPageMainContainer" width={'1500px'} bg={colors.default.bg_secondary} height={'100%'}>
+        {isSidebarOpen && (
+          <Sidebar
+            onClose={() => setIsSidebarOpen(false)}
+            windowWidth={windowWidth}
+          />
+        )}
+
         {Object.keys(userSelectedData || {}).length > 0 ? <Maincomponent /> : <Maincomponentnochat />}
+
+        {windowWidth < 800 && !isSidebarOpen && (
+          <Box
+            position="fixed"
+            left="0"
+            top="50%"
+            transform="translateY(-50%)"
+            zIndex="999"
+            onClick={() => setIsSidebarOpen(true)}
+            cursor="pointer"
+            p={2}
+            bg={colors.default.bg_primary}
+            borderRadius="0 10px 10px 0"
+          >
+            <Icon as={FiArrowRight} color="white" boxSize={6} />
+          </Box>
+        )}
+
         <ModalConfig />
         <ModalFriend />
       </Box>

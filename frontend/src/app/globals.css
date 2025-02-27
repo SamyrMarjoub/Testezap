@@ -7,6 +7,8 @@
   transition: 0.2s all linear;
 }
 
+
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -44,3 +46,10 @@ a {
     color-scheme: dark;
   }
 }
+
+@media (max-width:1500px) {
+  .messegerPageMainContainer{
+    width: '100%' !important;
+  }
+}
+

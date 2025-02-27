@@ -76,7 +76,7 @@ const HomePage = () => {
             Comece agora mesmo selecionando uma conversa ou iniciando uma nova!
           </Text>
           <Box width={'100%'}>
-            <Button onClick={() => router.push('/login')} width={'100%'} height={'40px'} bg={colors.default.blue} color={'white'} fontSize={'18px'}>Começar!</Button>
+            <Button onClick={() => localStorage.getItem('token') ? router.push('/messeger') : router.push('/login')} width={'100%'} height={'40px'} bg={colors.default.blue} color={'white'} fontSize={'18px'}>Começar!</Button>
 
           </Box>
           <Flex

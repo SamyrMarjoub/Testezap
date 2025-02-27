@@ -30,9 +30,8 @@ export default function Loading() {
         border="1px solid rgba(255, 255, 255, 0.1)"
       >
         <Spinner
-          thickness="3px"
-          speed="0.65s"
-          emptyColor="gray.600"
+          // speed="0.65s"
+          // emptyColor="gray.600"
           color="blue.400"
           width="50px"
           height="50px"

@@ -4,9 +4,9 @@ import React from 'react'
 import { FaRegCommentDots } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
-export default function maincomponentnochat() {
+export default function Maincomponentnochat() {
+    
     const MotionBox = motion(Box);
-
 
     return (
         <Box width="100%" height="100%" display="flex" padding="10px">

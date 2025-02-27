@@ -10,7 +10,7 @@ import { FaGithub } from 'react-icons/fa'
 import { FcGoogle } from 'react-icons/fc'
 import { HiOutlineChatBubbleOvalLeft } from 'react-icons/hi2'
 
-export default function page() {
+export default function Page() {
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
