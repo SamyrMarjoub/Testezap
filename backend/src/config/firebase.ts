@@ -1,26 +1,26 @@
 import admin from "firebase-admin";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
-import fs from "fs";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
-// dotenv.config(); // Carrega as variáveis de ambiente
 dotenv.config({ path: "src/config/.env" });
 
 console.log("FIREBASE_STORAGE_BUCKET:", process.env.FIREBASE_STORAGE_BUCKET); // Depuração
 
-// Verifica se a variável do bucket foi carregada corretamente
 if (!process.env.FIREBASE_STORAGE_BUCKET) {
   throw new Error("A variável FIREBASE_STORAGE_BUCKET não está definida no .env");
 }
 
-// Carregar credenciais do Firebase Admin a partir do arquivo JSON
-const serviceAccount = JSON.parse(fs.readFileSync("src/config/firebase-admin.json", "utf-8"));
+if (!process.env.FIREBASE_CREDENTIALS) {
+  throw new Error("A variável FIREBASE_CREDENTIALS não está definida no .env");
+}
+
+const serviceAccount = JSON.parse(process.env.FIREBASE_CREDENTIALS!);
 
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    storageBucket: process.env.FIREBASE_STORAGE_BUCKET, // Usa a variável do .env
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET, 
   });
 }
 
