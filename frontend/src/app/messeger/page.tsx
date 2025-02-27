@@ -64,7 +64,7 @@ const Dashboard = () => {
 
   const fetchUserData = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/user/${uid}`);
+      const response = await axios.get(`https://testezap-backend.vercel.app/api/user/${uid}`);
       console.log("User Data:", response.data);
       const userdata = response.data;
       setGlobalState('userData', userdata);
@@ -109,7 +109,7 @@ const Dashboard = () => {
       //   loadRequests();
       // }, []);
       try {
-        const response = await axios.post('http://localhost:5000/api/upload', formData, {
+        const response = await axios.post('https://testezap-backend.vercel.app/api/upload', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },

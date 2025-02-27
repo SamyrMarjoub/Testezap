@@ -4,10 +4,8 @@ import React, { useState } from 'react'
 import colors from '../styles/colors'
 import axios from 'axios'
 import { useRouter } from "next/navigation";
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
+import {  signInWithEmailAndPassword } from 'firebase/auth'
 import {auth} from '../services/firebaseClient'
-import { FaGithub } from 'react-icons/fa'
-import { FcGoogle } from 'react-icons/fc'
 import { HiOutlineChatBubbleOvalLeft } from 'react-icons/hi2'
 
 export default function Page() {
@@ -27,7 +25,7 @@ export default function Page() {
             const idToken = await user.getIdToken();
     
             // Enviar para o backend
-            const response = await axios.post("http://localhost:5000/api/auth/loginUser", {
+            const response = await axios.post("https://testezap-backend.vercel.app/api/auth/loginUser", {
                 idToken,
             });
     

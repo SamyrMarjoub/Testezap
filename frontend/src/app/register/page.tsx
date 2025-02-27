@@ -24,7 +24,7 @@ const RegisterPage = () => {
         }
 
         try {
-            const response = await axios.post("http://localhost:5000/api/auth/registerUser", {
+            const response = await axios.post("https://testezap-backend.vercel.app/api/auth/registerUser", {
                 email: email,
                 password: password,
                 username: username
